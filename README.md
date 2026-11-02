@@ -7,7 +7,7 @@ Five security tools I designed and built. The source is private, so this page sh
 | [**LSS**](#lss-linux-security-suite) | Audits and hardens Linux against the CIS Benchmark, with rollback | Python | v1.0.2 |
 | [**LSS STIG**](#lss-stig) | Audits and hardens Ubuntu against DISA STIGs and writes STIG Viewer checklists | Python | v1.0.0 |
 | [**Wraith**](#wraith) | Detects command-and-control activity from how it disturbs the operating system | Python, NumPy, eBPF | v2.6.0, in active development |
-| [**SitRep**](#sitrep) | Reads system logs and explains in plain English what went wrong | Rust | v0.1.0 |
+| [**SitRep**](#sitrep) | Reads system logs and explains in plain English what went wrong | Rust | v0.2.1 |
 | [**APEX**](#apex) | Raises shell scripts to the standard their job calls for, offline | Python | Working |
 
 ---
@@ -20,20 +20,20 @@ A single command-line tool with no agent and no cloud service. It covers 206 con
 
 The other 40 stay audit-only on purpose. Repartitioning, bootloader edits and account decisions can take a machine down or destroy evidence, so LSS gives the operator the exact steps instead of guessing.
 
-Here's a stock Ubuntu 24.04 machine before and after one hardening run:
+Here's a stock Ubuntu 24.04 machine before hardening, and after hardening and a reboot:
 
 <table>
 <tr>
 <td width="50%"><img src="images/lss-before.png" alt="LSS audit of a stock Ubuntu 24.04 host: 51 percent hardened, 72 failing controls"></td>
-<td width="50%"><img src="images/lss-after.png" alt="LSS audit after hardening: 87 percent hardened, 4 failing controls"></td>
+<td width="50%"><img src="images/lss-after.png" alt="LSS audit after hardening and a reboot: 89 percent hardened, 4 failing controls"></td>
 </tr>
 </table>
 
-Failing controls dropped from 72 to 4 in that run.
+Failing controls dropped from 72 to 4, and the result held after the reboot.
 
 **Built to be safe on a live system**
 
-- **Rollback journal:** every change is recorded with a backup of the file and its undo command. Rollback replays them in reverse and reports anything it couldn't undo. In the run above, `sshd_config`, `sysctl.conf`, `fstab` and `login.defs` all came back byte-identical.
+- **Rollback journal:** every change is recorded with a backup of the file and its undo command. Rollback replays them in reverse and reports anything it couldn't undo. In the run above it finished with no errors, even after the reboot, and `sshd_config`, `sysctl.conf`, `fstab` and `login.defs` came back byte-identical. One kernel setting that can't be changed back while running returns to normal at the next boot, and LSS says so.
 - **Lockout protection:** LSS checks before making changes that could cut you off. Here it refused to disable root SSH login because the machine had no other admin account:
 
 <p align="center"><img src="images/lss-harden.png" alt="LSS harden output for SSH controls, skipping a fix that would cause a lockout" width="80%"></p>
@@ -49,7 +49,16 @@ Failing controls dropped from 72 to 4 in that run.
 
 It covers all 194 rules of the Canonical Ubuntu 24.04 LTS STIG, V1R6, with no third-party dependencies, so it works on air-gapped machines. Every audit writes a `.cklb` checklist with the evidence for each automated check.
 
-<p align="center"><img src="images/stig-summary.png" alt="LSS STIG audit summary by severity on a stock Ubuntu 24.04 host" width="80%"></p>
+Here's a stock Ubuntu 24.04 machine before hardening, and after hardening and a reboot:
+
+<table>
+<tr>
+<td width="50%"><img src="images/stig-before.png" alt="LSS STIG audit of a stock Ubuntu 24.04 host: 123 open findings"></td>
+<td width="50%"><img src="images/stig-after.png" alt="LSS STIG audit after hardening and a reboot: 18 open findings, none auto-fixable"></td>
+</tr>
+</table>
+
+One run applied 102 fixes with no errors and took open findings from 123 to 18. Those 18 need an operator's decision. After rollback, audit results, packages, services, firewall state and SSH settings all matched the original machine.
 
 **It doesn't blindly apply DISA's fix text.** Some published fixes would damage the machine, so LSS STIG does what the rule's check actually verifies:
 
@@ -58,6 +67,7 @@ It covers all 194 rules of the Canonical Ubuntu 24.04 LTS STIG, V1R6, with no th
 | V-270824 | `chmod -R 755` on command directories | Strips setuid from `sudo`, `su` and `passwd` | Removes only the directory's write bits |
 | V-270655 | `ufw enable` | Locks out a remote admin | Sets `ufw limit` on SSH ports first |
 | V-270645 | Purge `systemd-timesyncd` | Leaves the machine with no time daemon | Installs chrony first |
+| V-270694 | Loop around the consent prompt | Hangs any login shell with no terminal at 100% CPU | Refuses that session |
 
 ---
 
@@ -122,12 +132,12 @@ The engine is deterministic and fully offline, with no third-party dependencies.
 
 ## Testing
 
-Test suites as last run. LSS, LSS STIG, Wraith and APEX ran on Ubuntu 24.04 arm64, and SitRep ran on macOS.
+LSS and LSS STIG also went through full harden, reboot and rollback cycles on an Ubuntu 24.04 arm64 VM. Test suites as last run: LSS, LSS STIG, Wraith and APEX on Ubuntu 24.04 arm64, and SitRep on macOS.
 
 | Tool | Result |
 |---|---|
-| LSS | 1,699 passed, 1 skipped |
-| LSS STIG | 85 tests passed |
+| LSS | 1,709 passed, 1 skipped |
+| LSS STIG | 91 tests passed |
 | Wraith | 675 passed, 4 skipped |
 | SitRep | 79 passed |
 | APEX | 101 checks passed |

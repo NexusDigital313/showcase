@@ -1,6 +1,6 @@
-<p align="center"><img src="images/hero.png" alt="Jacob Parmenter: security tools" width="100%"></p>
+<p align="center"><img src="images/nexus-digital.png" alt="Nexus Digital" width="100%"></p>
 
-Five security tools and three AI web apps I designed and built. The source is private, so this page shows what each one does. Every terminal image is output from a real run, trimmed to fit. Each web app section says what its image shows.
+Nexus Digital is the independent studio of Jacob Parmenter. Here are five security tools and three AI web apps I designed and built. The source is private, so this page shows what each one does. Every terminal image is output from a real run, trimmed to fit. Each web app section says what its image shows.
 
 | Project | What it does | Built with | Status |
 |---|---|---|---|

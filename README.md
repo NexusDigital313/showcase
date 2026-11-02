@@ -1,6 +1,6 @@
 <p align="center"><img src="images/nexus-digital.png" alt="Nexus Digital" width="100%"></p>
 
-Nexus Digital is the independent studio of Jacob Parmenter. This page covers five security tools and three AI web apps I designed and built. Source code is private. Terminal images come from real runs, trimmed to fit.
+Nexus Digital is the independent studio of Jacob Parmenter. This page covers five security tools and three AI web apps, my work with Claude Code: I set the design and direction, and Claude Code writes the code. Source code is private. Terminal images come from real runs, trimmed to fit.
 
 | Project | Function | Stack | Status |
 |---|---|---|---|

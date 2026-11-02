@@ -1,14 +1,17 @@
 <p align="center"><img src="images/hero.png" alt="Jacob Parmenter: security tools" width="100%"></p>
 
-Five security tools I designed and built. The source is private, so this page shows what each one does. Every terminal image is output from a real run, trimmed to fit.
+Five security tools and three AI web apps I designed and built. The source is private, so this page shows what each one does. Every terminal image is output from a real run, trimmed to fit. Each web app section says what its image shows.
 
-| Tool | What it does | Built with | Status |
+| Project | What it does | Built with | Status |
 |---|---|---|---|
 | [**LSS**](#lss-linux-security-suite) | Audits and hardens Linux against the CIS Benchmark, with rollback | Python | v1.0.2 |
 | [**LSS STIG**](#lss-stig) | Audits and hardens Ubuntu against DISA STIGs and writes STIG Viewer checklists | Python | v1.0.0 |
 | [**Wraith**](#wraith) | Detects command-and-control activity from how it disturbs the operating system | Python, NumPy, eBPF | v2.6.0, in active development |
 | [**SitRep**](#sitrep) | Reads system logs and explains in plain English what went wrong | Rust | v0.2.1 |
 | [**APEX**](#apex) | Raises shell scripts to the standard their job calls for, offline | Python | Working |
+| [**Canon**](#canon) | Checks a whole novel for continuity errors in one pass | Next.js, TypeScript, Claude API | Sample demo tested, live Claude pass not yet run |
+| [**Cull**](#cull) | Groups photo bursts and keeps the best shot from each | Next.js, TypeScript, Claude API | Local culling tested, Claude picks not yet run |
+| [**ReplyDesk**](#replydesk) | Drafts replies to customer reviews and messages in a business's own voice | Next.js, TypeScript, Claude API | Interface prototype |
 
 ---
 
@@ -130,9 +133,51 @@ The engine is deterministic and fully offline, with no third-party dependencies.
 
 ---
 
+## Canon
+
+**A continuity editor for novels: it builds a story bible, then checks the manuscript against it.**
+
+Canon pulls out the book's characters, locations, timeline and world facts into a bible the author can edit. A second pass sends the whole manuscript and the bible to Claude in one call and reports each continuity break with a severity rating.
+
+<p align="center"><img src="images/canon.png" alt="Canon home page with a manuscript upload area and a sample continuity report" width="90%"></p>
+
+The report card in this image is an illustration from the home page, not output from a real book.
+
+> **Where it stands:** uploading and parsing a manuscript works. The bundled 5-chapter sample ran through both steps and showed 6 findings, but its analysis is hand-written demo data. A live Claude pass hasn't been run in testing yet.
+
+---
+
+## Cull
+
+**Groups near-duplicate photos, picks a keeper from each burst and exports the keepers as a zip.**
+
+Perceptual hashing and sharpness scoring run in the browser. An optional step asks Claude to choose the best shot in each burst, sending 256px thumbnails rather than the full photos.
+
+<p align="center"><img src="images/cull.png" alt="Cull home page with a sample burst of photos marked keep or delete" width="90%"></p>
+
+The burst in this image is a home page illustration. The "100% on-device" label is older wording: the Claude step does send thumbnails, and the app now says "Full photos stay on-device".
+
+> **Where it stands:** in a test with 15 synthetic images, Cull sorted all 12 burst frames into the correct 3 bursts and exported 5 keepers as a zip. The automatic junk flags still need work: on those images it marked one sharp photo for deletion and missed a simulated screenshot. The Claude step hasn't been run in testing yet.
+
+---
+
+## ReplyDesk
+
+**Drafts replies to customer reviews, emails and DMs in a business's own voice.**
+
+The flow starts with a short interview to learn how the business sounds, then opens an inbox where each message gets a draft that can be adjusted for tone.
+
+<p align="center"><img src="images/replydesk.jpg" alt="ReplyDesk promotional artwork showing a customer review and a drafted reply" width="80%"></p>
+
+This image is promotional artwork, not a screenshot.
+
+> **Where it stands:** this is an interface prototype. The app runs, but the interview is scripted and the inbox holds sample messages, with no way yet to bring in real reviews. Claude drafting is built for use with a customer's own API key, but it hasn't been run in testing yet.
+
+---
+
 ## Testing
 
-LSS and LSS STIG also went through full harden, reboot and rollback cycles on an Ubuntu 24.04 arm64 VM. Test suites as last run: LSS, LSS STIG, Wraith and APEX on Ubuntu 24.04 arm64, and SitRep on macOS.
+LSS and LSS STIG also went through full harden, reboot and rollback cycles on an Ubuntu 24.04 arm64 VM. Test suites as last run: LSS, LSS STIG, Wraith and APEX on Ubuntu 24.04 arm64, and SitRep, Canon and Cull on macOS. The Canon and Cull suites cover license validation, and ReplyDesk has no test suite yet.
 
 | Tool | Result |
 |---|---|
@@ -141,6 +186,8 @@ LSS and LSS STIG also went through full harden, reboot and rollback cycles on an
 | Wraith | 675 passed, 4 skipped |
 | SitRep | 79 passed |
 | APEX | 101 checks passed |
+| Canon | 10 passed |
+| Cull | 10 passed |
 
 ---
 
